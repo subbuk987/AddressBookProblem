@@ -26,6 +26,7 @@ if __name__ == "__main__":
 
     address_book = AddressBook()
     address_book.add_contact(details)
+
     address_book.show_contacts()
 
 
