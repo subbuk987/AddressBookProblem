@@ -10,8 +10,11 @@ class AddressBook:
         self.contacts.append(contact)
 
     def show_contacts(self):
-        for contact in self.contacts:
-            print(contact.details)
+        if not self.contacts:
+            print("The Address Book is empty!!!")
+        else:
+            for contact in self.contacts:
+                print(contact.details)
 
     def edit_contact(self, name, field, value):
         firstname, lastname = name.split()
@@ -20,6 +23,13 @@ class AddressBook:
                 'last name'] == lastname:
                 contact.edit_contact(field,value)
                 break
+
+    def delete_contact(self, name):
+        firstname, lastname = name.split()
+        for contact in self.contacts:
+            if contact.details['first name'] == firstname and contact.details[
+                'last name'] == lastname:
+                self.contacts.remove(contact)
 
 if __name__ == "__main__":
     details = {
@@ -37,6 +47,5 @@ if __name__ == "__main__":
     address_book.add_contact(details)
 
     address_book.show_contacts()
-
-    address_book.edit_contact("Kandlagunta Subramanyam", "state", "Andhra")
+    address_book.delete_contact("Kandlagunta Subramanyam")
     address_book.show_contacts()
