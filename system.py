@@ -56,6 +56,11 @@ class AddressBookManager:
             print(f"\n-------- PERSON {i + 1} --------")
             print_contact(contact)
 
+    def count_by_state_or_city(self, field, name):
+        return (f'There are {len(self.city_people[name])} People in {name}'
+                f' city.') if field == 'city' else \
+            f'There are {len(self.state_people[name])} People in {name} state.'
+
     def __len__(self):
         return len(self.address_books)
 
@@ -74,7 +79,8 @@ def main():
 3. Add a Contact to an Address Book
 4. Search Contacts by City
 5. Search Contacts by State
-6. Quit
+6. Count By City or State
+7. Quit
 ==============================
 Enter your choice: '''))
 
@@ -137,6 +143,29 @@ Enter your choice: '''))
                     manager.search_by_state(state_choice)
 
                 case 6:
+                    lookup_choice = input("Enter 'city' for lookup by city.\
+                           Enter 'state' for lookup by State: ").strip().lower()
+
+                    if lookup_choice == 'city':
+                        city_lookup = input("Enter City Name: ").strip()
+                        if city_lookup in manager.city_people:
+                            print(manager.count_by_state_or_city('city',
+                                                                 city_lookup))
+                        else:
+                            print(f"No contacts found in city: {city_lookup}")
+                    elif lookup_choice == 'state':
+                        state_lookup = input("Enter State Name: ").strip()
+                        if state_lookup in manager.state_people:
+                            print(manager.count_by_state_or_city('state',
+                                                                 state_lookup))
+                        else:
+                            print(
+                                f"No contacts found in state: {state_lookup}")
+                    else:
+                        print(
+                            "Invalid choice. Please enter 'city' or 'state'.")
+
+                case 7:
                     print("Exiting Address Book Program. Goodbye!")
                     run = False
 
@@ -144,7 +173,7 @@ Enter your choice: '''))
                     print("Invalid choice. Please select a valid option.")
 
         except ValueError:
-            print("Invalid input. Please enter a number between 1 and 4.")
+            print("Invalid input. Please enter a number between 1 and 7.")
 
 
 if __name__ == "__main__":
