@@ -8,6 +8,7 @@ class AddressBook:
     def add_contact(self, contact_info):
         contact = Contact(contact_info)
         self.contacts.append(contact)
+        return contact
 
     def show_contacts(self):
         if not self.contacts:
