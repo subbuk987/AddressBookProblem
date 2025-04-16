@@ -75,8 +75,15 @@ Enter your choice: '''))
 
                         if book:
                             details = get_contact_details()
-                            book.add_contact(details)
-                            print("Contact added successfully.")
+                            if (details["first name"],details[
+                                "last name"]) in book:
+                                print(
+                                    f"Contact With {details["first name"]} "
+                                    f"{details["last name"]} already "
+                                    f"in Address Book!!!")
+                            else:
+                                book.add_contact(details)
+                                print("Contact added successfully.")
 
                             add_more = input(
                                 "Do you want to add more contacts? [Y/N]: ")
