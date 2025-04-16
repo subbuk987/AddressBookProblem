@@ -10,8 +10,9 @@ class AddressBookManager:
         if not self.address_books:
             print("There are no Address Books to Show!!!")
         else:
-            for name in self.address_books.keys():
-                print("-", name)
+            print("Available Address Books:")
+            for name in self.address_books:
+                print(f"- {name}")
 
     def add_address_book(self, name):
         if name in self.address_books:
@@ -52,8 +53,13 @@ Enter your choice: '''))
                     manager.show_address_book_names()
 
                 case 2:
-                    book_name = input("Enter Address Book Name: ").strip()
-                    manager.add_address_book(book_name)
+                    while True:
+                        book_name = input("Enter Address Book Name: ").strip()
+                        manager.add_address_book(book_name)
+                        add_more = input(
+                            "Do you want to Create more Address Books? [Y/N]: ")
+                        if add_more.lower() != 'y':
+                            break
 
                 case 3:
                     if len(manager) == 0:
