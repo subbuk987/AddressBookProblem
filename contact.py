@@ -2,6 +2,9 @@ class Contact:
     def __init__(self, contact_details):
         self.details = contact_details
 
+    def edit_contact(self, field, value):
+        self.details[field] = value
+
 
 if __name__ ==  "__main__":
     details = {
