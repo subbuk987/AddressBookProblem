@@ -8,6 +8,20 @@ def get_contact_details():
 
     return details
 
+
+def print_contact(contact):
+    print(f"""
+==============================
+First Name: {contact.details["first name"]}
+Last Name: {contact.details["last name"]}
+Address: {contact.details["address"]}
+City: {contact.details["city"]}
+State: {contact.details["state"]}
+Zip: {contact.details["zip"]}
+Phone: {contact.details["phone"]}
+Email: {contact.details["Email"]}
+==============================""")
+
 if __name__ == "__main__":
 
    print(get_contact_details())

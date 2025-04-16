@@ -1,11 +1,12 @@
 from addressbook import AddressBook
-from utils.utility import get_contact_details
+from utils.utility import get_contact_details, print_contact
 
 
 class AddressBookManager:
     def __init__(self):
         self.address_books = {}
         self.city_people = {}
+        self.state_people = {}
 
     def show_address_book_names(self):
         if not self.address_books:
@@ -38,19 +39,22 @@ class AddressBookManager:
             print(f"No contacts found in city: {city}")
             return
         for i, contact in enumerate(self.city_people[city]):
-            print(f"""
-        PERSON: {i+1}
-==============================
-First Name: {contact.details["first name"]}
-Last Name: {contact.details["last name"]}
-Address: {contact.details["address"]}
-City: {contact.details["city"]}
-State: {contact.details["state"]}
-Zip: {contact.details["zip"]}
-Phone: {contact.details["phone"]}
-Email: {contact.details["Email"]}
-==============================""")
+            print(f"\n-------- PERSON {i + 1} --------")
+            print_contact(contact)
 
+    def add_into_state(self, contact):
+        if contact.details["state"] not in self.state_people:
+            self.state_people[contact.details["state"]] = [contact]
+        else:
+            self.state_people[contact.details["state"]].append(contact)
+
+    def search_by_state(self, state):
+        if not self.state_people or state not in self.state_people:
+            print(f"No contacts found in State: {state}")
+            return
+        for i, contact in enumerate(self.state_people[state]):
+            print(f"\n-------- PERSON {i + 1} --------")
+            print_contact(contact)
 
     def __len__(self):
         return len(self.address_books)
@@ -69,7 +73,8 @@ def main():
 2. Add New Address Book
 3. Add a Contact to an Address Book
 4. Search Contacts by City
-5. Quit
+5. Search Contacts by State
+6. Quit
 ==============================
 Enter your choice: '''))
 
@@ -102,7 +107,7 @@ Enter your choice: '''))
 
                         if book:
                             details = get_contact_details()
-                            if (details["first name"],details[
+                            if (details["first name"], details[
                                 "last name"]) in book:
                                 print(
                                     f"Contact With {details['first name']} "
@@ -111,6 +116,7 @@ Enter your choice: '''))
                             else:
                                 contact = book.add_contact(details)
                                 manager.add_into_city(contact)
+                                manager.add_into_state(contact)
                                 print("Contact added successfully.")
 
                             add_more = input(
@@ -123,12 +129,16 @@ Enter your choice: '''))
                             break
 
                 case 4:
-                    print("Exiting Address Book Program. Goodbye!")
-                    run = False
-
-                case 5:
                     city_choice = input("Please enter the City Name: ")
                     manager.search_by_city(city_choice)
+
+                case 5:
+                    state_choice = input("Please enter the State Name: ")
+                    manager.search_by_state(state_choice)
+
+                case 6:
+                    print("Exiting Address Book Program. Goodbye!")
+                    run = False
 
                 case _:
                     print("Invalid choice. Please select a valid option.")
