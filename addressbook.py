@@ -76,4 +76,3 @@ if __name__ == "__main__":
 
     address_book.show_contacts()
     address_book.delete_contact("Kandlagsunta")
-    address_book.show_contacts()
