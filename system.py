@@ -1,18 +1,37 @@
 import csv
+import json
 import os
 from addressbook import AddressBook
 from utils.utility import get_contact_details, print_contact, read_from_file, \
     write_to_file
 from utils.regex import FILE_INPUT_KEY, FILE_INPUT_VAL
 
-
+# The AddressBookManager class is responsible for managing multiple AddressBooks,
+# handling adding contacts, searching by city/state, and saving contacts to different formats.
 class AddressBookManager:
+    """
+    A class to manage multiple address books, add contacts, search by city/state,
+    and save address books to various formats such as .txt, .csv, and .json.
+
+    Attributes:
+        address_books (dict): A dictionary to store address books by their names.
+        city_people (dict): A dictionary to store contacts grouped by city.
+        state_people (dict): A dictionary to store contacts grouped by state.
+    """
+
     def __init__(self):
+        """
+        Initializes the AddressBookManager instance with empty dictionaries
+        for storing address books, city-wise, and state-wise contacts.
+        """
         self.address_books = {}
         self.city_people = {}
         self.state_people = {}
 
     def show_address_book_names(self):
+        """
+        Displays the names of all available address books.
+        """
         if not self.address_books:
             print("There are no Address Books to Show!!!")
         else:
@@ -21,6 +40,15 @@ class AddressBookManager:
                 print(f"- {name}")
 
     def add_address_book(self, name):
+        """
+        Adds a new address book with the given name to the manager.
+
+        Args:
+            name (str): The name of the address book to be added.
+
+        Returns:
+            AddressBook: The newly created AddressBook object.
+        """
         if name in self.address_books:
             print(f"Address Book with {name} already Available!!!")
         else:
@@ -29,22 +57,50 @@ class AddressBookManager:
             return self.address_books[name]
 
     def handle_add_contact(self, book, details):
+        """
+        Adds a contact to the specified address book and updates the city and state lists.
+
+        Args:
+            book (AddressBook): The address book to add the contact to.
+            details (dict): A dictionary containing the contact's details.
+        """
         contact = book.add_contact(details)
         self.add_into_city(contact)
         self.add_into_state(contact)
 
     def get_address_book(self, name):
+        """
+        Retrieves an address book by its name.
+
+        Args:
+            name (str): The name of the address book to retrieve.
+
+        Returns:
+            AddressBook or None: The AddressBook object if found, else None.
+        """
         if name not in self.address_books:
             return None
         return self.address_books[name]
 
     def add_into_city(self, contact):
+        """
+        Adds a contact to the city_people dictionary, grouped by city.
+
+        Args:
+            contact (Contact): The contact to add.
+        """
         if contact.info["city"] not in self.city_people:
             self.city_people[contact.info["city"]] = [contact]
         else:
             self.city_people[contact.info["city"]].append(contact)
 
     def search_by_city(self, city):
+        """
+        Searches for contacts in a specific city and displays them.
+
+        Args:
+            city (str): The city to search contacts by.
+        """
         if not self.city_people or city not in self.city_people:
             print(f"No contacts found in city: {city}")
             return
@@ -53,12 +109,24 @@ class AddressBookManager:
             print_contact(contact)
 
     def add_into_state(self, contact):
+        """
+        Adds a contact to the state_people dictionary, grouped by state.
+
+        Args:
+            contact (Contact): The contact to add.
+        """
         if contact.info["state"] not in self.state_people:
             self.state_people[contact.info["state"]] = [contact]
         else:
             self.state_people[contact.info["state"]].append(contact)
 
     def search_by_state(self, state):
+        """
+        Searches for contacts in a specific state and displays them.
+
+        Args:
+            state (str): The state to search contacts by.
+        """
         if not self.state_people or state not in self.state_people:
             print(f"No contacts found in State: {state}")
             return
@@ -67,11 +135,27 @@ class AddressBookManager:
             print_contact(contact)
 
     def count_by_state_or_city(self, field, name):
+        """
+        Counts the number of contacts in a specific city or state.
+
+        Args:
+            field (str): Either 'city' or 'state' to specify the field to count.
+            name (str): The name of the city or state to count contacts by.
+
+        Returns:
+            str: The count of contacts in the specified city or state.
+        """
         return (f'There are {len(self.city_people[name])} People in {name}'
                 f' city.') if field == 'city' else \
             f'There are {len(self.state_people[name])} People in {name} state.'
 
     def create_from_file(self, file_path):
+        """
+        Reads contacts from a file and adds them to the appropriate address books.
+
+        Args:
+            file_path (str): The file path to read the contacts from.
+        """
         if os.path.exists(file_path) and os.path.getsize(file_path) == 0:
             print(f"The file {file_path} is empty.")
             return
@@ -102,7 +186,12 @@ class AddressBookManager:
                 details.clear()
 
     def save_to_file(self, filepath):
+        """
+        Saves all address books and their contacts to a text file.
 
+        Args:
+            filepath (str): The path of the file to save the contacts to.
+        """
         for name, book in self.address_books.items():
             with open(filepath, 'w') as file:
                 file.write(f"AddressBook Name : {name}\n")
@@ -113,6 +202,12 @@ class AddressBookManager:
                 file.write("\n")
 
     def save_all_contacts_to_csv(self, csv_file_path):
+        """
+        Saves all address books and their contacts to a CSV file.
+
+        Args:
+            csv_file_path (str): The path of the CSV file to save the contacts to.
+        """
         if not self.address_books:
             print("No Address Books available to save.")
             return
@@ -140,11 +235,41 @@ class AddressBookManager:
 
         print(f"All contacts saved to '{csv_file_path}' successfully!")
 
+    def save_to_json(self, filepath):
+        """
+        Saves all address books and their contacts to a JSON file.
+
+        Args:
+            filepath (str): The path of the JSON file to save the contacts to.
+        """
+        address_books_data = {}
+
+        for name, book in self.address_books.items():
+            book_data = []
+            for contact in book.contacts:
+                book_data.append(contact.info)
+            address_books_data[name] = book_data
+
+        with open(filepath, 'w') as file:
+            json.dump(address_books_data, file, indent=4)
+
+        print(f"Contacts Saved to {filepath}")
+
     def __len__(self):
+        """
+        Returns the number of address books managed by the AddressBookManager.
+
+        Returns:
+            int: The number of address books.
+        """
         return len(self.address_books)
 
 
 def main():
+    """
+    The main function to interact with the AddressBookManager. It allows the user
+    to manage address books, add contacts, search by city/state, and save data.
+    """
     print("Welcome to Address Book Program!!!")
     default_file = 'files/contact_details.txt'
     manager = AddressBookManager()
@@ -164,7 +289,8 @@ def main():
 7. Count By City or State
 8. Sort an Address Book By any Field
 9. Save contacts to CSV
-10. Quit
+10.Save contacts to json
+11. Quit
 ==============================
 Enter your choice: '''))
 
@@ -273,6 +399,9 @@ Enter The field name to sort by:
                     manager.save_all_contacts_to_csv('files/contacts.csv')
 
                 case 10:
+                    manager.save_to_json('files/contacts.json')
+
+                case 11:
                     print("Exiting Address Book Program. Goodbye!")
                     manager.save_to_file(default_file)
                     run = False
