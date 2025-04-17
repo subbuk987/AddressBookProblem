@@ -6,6 +6,8 @@ class Contact:
         self.details[field] = value
 
 
+
+
 if __name__ ==  "__main__":
     details = {
         "first name" : "Kandlagunta",

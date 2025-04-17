@@ -80,7 +80,8 @@ def main():
 4. Search Contacts by City
 5. Search Contacts by State
 6. Count By City or State
-7. Quit
+7. Sort an Address Book By Name
+8. Quit
 ==============================
 Enter your choice: '''))
 
@@ -166,6 +167,13 @@ Enter your choice: '''))
                             "Invalid choice. Please enter 'city' or 'state'.")
 
                 case 7:
+                    manager.show_address_book_names()
+                    address_book = manager.get_address_book(input(
+                        "Select the Address Book to sort By Name:"))
+                    address_book.sort_by_name()
+                    print("The Address Book is Now Sorted By Name...")
+
+                case 8:
                     print("Exiting Address Book Program. Goodbye!")
                     run = False
 

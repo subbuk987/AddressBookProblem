@@ -22,11 +22,11 @@ class AddressBook:
         for contact in self.contacts:
             if contact.details['first name'] == firstname and contact.details[
                 'last name'] == lastname:
-                contact.edit_contact(field,value)
+                contact.edit_contact(field, value)
                 break
 
     def delete_contact(self, name):
-        firstname , lastname = None, None
+        firstname, lastname = None, None
         parts = name.strip().split()
 
         if len(parts) == 2:
@@ -46,6 +46,10 @@ class AddressBook:
 
         print("No Such Contact Available!!!")
 
+    def sort_by_name(self):
+        self.contacts.sort(
+            key=lambda x: (x.details["first name"], x.details["last name"]))
+
 
     def __contains__(self, item):
         firstname, lastname = item
@@ -57,7 +61,6 @@ class AddressBook:
                     return True
 
         return False
-
 
 
 if __name__ == "__main__":
@@ -74,6 +77,20 @@ if __name__ == "__main__":
 
     address_book = AddressBook()
     address_book.add_contact(details)
-
     address_book.show_contacts()
-    address_book.delete_contact("Kandlagsunta")
+
+    detail = {
+        "first name": "Kandlagunta",
+        "last name": "Anj",
+        "address": "Chitlapakkam",
+        "city": "Chennai",
+        "state": "TamilNadu",
+        "zip": "600064",
+        "phone": "7200920651",
+        "email": "subramanyamk2003@gmail.com"
+    }
+    address_book.add_contact(detail)
+    address_book.show_contacts()
+
+    address_book.sort_by_name()
+    address_book.show_contacts()
