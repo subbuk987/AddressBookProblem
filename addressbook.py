@@ -1,4 +1,5 @@
 from contact import Contact
+from utils.utility import print_contact
 
 
 class AddressBook:
@@ -15,12 +16,12 @@ class AddressBook:
             print("The Address Book is empty!!!")
         else:
             for contact in self.contacts:
-                print(contact.details)
+                print_contact(contact)
 
     def edit_contact(self, name, field, value):
         firstname, lastname = name.split()
         for contact in self.contacts:
-            if contact.details['first name'] == firstname and contact.details[
+            if contact.info['first name'] == firstname and contact.info[
                 'last name'] == lastname:
                 contact.edit_contact(field, value)
                 break
@@ -35,8 +36,8 @@ class AddressBook:
             firstname = parts[0]
 
         for contact in self.contacts:
-            if contact.details['first name'] == firstname:
-                if lastname is None or contact.details[
+            if contact.info['first name'] == firstname:
+                if lastname is None or contact.info[
                     'last name'] == lastname:
                     self.contacts.remove(contact)
                     print(
@@ -50,24 +51,24 @@ class AddressBook:
         if field == 'name':
             self.contacts.sort(
                 key=lambda x: (
-                x.details["first name"], x.details["last name"]))
+                    x.info["first name"], x.info["last name"]))
         elif field == 'city':
             self.contacts.sort(
-                key=lambda x: x.details["city"])
+                key=lambda x: x.info["city"])
         elif field == 'state':
             self.contacts.sort(
-                key=lambda x: x.details["state"])
+                key=lambda x: x.info["state"])
         elif field == 'zip':
             self.contacts.sort(
-                key=lambda x: x.details["zip"])
+                key=lambda x: x.info["zip"])
 
     def __contains__(self, item):
         firstname, lastname = item
 
         for contact in self.contacts:
-            if contact.details['first name'] == firstname:
+            if contact.info['first name'] == firstname:
                 if (lastname is None or
-                        contact.details['last name'] == lastname):
+                        contact.info['last name'] == lastname):
                     return True
 
         return False

@@ -1,5 +1,8 @@
+import os
 from addressbook import AddressBook
-from utils.utility import get_contact_details, print_contact
+from utils.utility import get_contact_details, print_contact, read_from_file, \
+    write_to_file
+from utils.regex import FILE_INPUT_KEY, FILE_INPUT_VAL
 
 
 class AddressBookManager:
@@ -22,6 +25,12 @@ class AddressBookManager:
         else:
             self.address_books[name] = AddressBook()
             print(f"Address Book with name: {name} is created.")
+            return self.address_books[name]
+
+    def handle_add_contact(self, book, details):
+        contact = book.add_contact(details)
+        self.add_into_city(contact)
+        self.add_into_state(contact)
 
     def get_address_book(self, name):
         if name not in self.address_books:
@@ -29,10 +38,10 @@ class AddressBookManager:
         return self.address_books[name]
 
     def add_into_city(self, contact):
-        if contact.details["city"] not in self.city_people:
-            self.city_people[contact.details["city"]] = [contact]
+        if contact.info["city"] not in self.city_people:
+            self.city_people[contact.info["city"]] = [contact]
         else:
-            self.city_people[contact.details["city"]].append(contact)
+            self.city_people[contact.info["city"]].append(contact)
 
     def search_by_city(self, city):
         if not self.city_people or city not in self.city_people:
@@ -43,10 +52,10 @@ class AddressBookManager:
             print_contact(contact)
 
     def add_into_state(self, contact):
-        if contact.details["state"] not in self.state_people:
-            self.state_people[contact.details["state"]] = [contact]
+        if contact.info["state"] not in self.state_people:
+            self.state_people[contact.info["state"]] = [contact]
         else:
-            self.state_people[contact.details["state"]].append(contact)
+            self.state_people[contact.info["state"]].append(contact)
 
     def search_by_state(self, state):
         if not self.state_people or state not in self.state_people:
@@ -61,13 +70,56 @@ class AddressBookManager:
                 f' city.') if field == 'city' else \
             f'There are {len(self.state_people[name])} People in {name} state.'
 
+    def create_from_file(self, file_path):
+        if os.path.exists(file_path) and os.path.getsize(file_path) == 0:
+            print(f"The file {file_path} is empty.")
+            return
+
+        book = None
+        details = {}
+        count = 0
+        lines = read_from_file(file_path)
+
+        for line in lines:
+            if not line:
+                continue
+
+            if "AddressBook Name :" in line:
+                book_name = FILE_INPUT_VAL.findall(line)[0][2:]
+                book = self.add_address_book(book_name)
+            elif "Contact" in line or "====" in line:
+                continue
+            else:
+                count += 1
+                key = FILE_INPUT_KEY.findall(line)[0][:-2]
+                val = FILE_INPUT_VAL.findall(line)[0][2:]
+                details[key] = val
+
+            if count == 8:
+                self.handle_add_contact(book, details.copy())
+                count = 0
+                details.clear()
+
+    def save_to_file(self, filepath):
+
+        for name, book in self.address_books.items():
+            with open(filepath, 'a') as file:
+                file.write(f"AddressBook Name : {name}\n")
+                file.write(f"===========================================\n")
+            for contact in book.contacts:
+                write_to_file(filepath, contact.info)
+            with open(filepath, 'a') as file:
+                file.write("\n")
+
     def __len__(self):
         return len(self.address_books)
 
 
 def main():
     print("Welcome to Address Book Program!!!")
+    default_file = 'files/contact_details.txt'
     manager = AddressBookManager()
+    manager.create_from_file(default_file)
 
     run = True
     while run:
@@ -75,13 +127,14 @@ def main():
             choice = int(input('''
 ==============================
 1. Show Address Books
-2. Add New Address Book
-3. Add a Contact to an Address Book
-4. Search Contacts by City
-5. Search Contacts by State
-6. Count By City or State
-7. Sort an Address Book By any Field
-8. Quit
+2. Show Contacts
+3. Add New Address Book
+4. Add a Contact to an Address Book
+5. Search Contacts by City
+6. Search Contacts by State
+7. Count By City or State
+8. Sort an Address Book By any Field
+9. Quit
 ==============================
 Enter your choice: '''))
 
@@ -92,6 +145,12 @@ Enter your choice: '''))
                     manager.show_address_book_names()
 
                 case 2:
+                    manager.show_address_book_names()
+                    selected_name = input(
+                        "Enter Address Book Name: ").strip()
+                    manager.address_books[selected_name].show_contacts()
+
+                case 3:
                     while True:
                         book_name = input("Enter Address Book Name: ").strip()
                         manager.add_address_book(book_name)
@@ -100,7 +159,7 @@ Enter your choice: '''))
                         if add_more.lower() != 'y':
                             break
 
-                case 3:
+                case 4:
                     if len(manager) == 0:
                         print(
                             "No Address Books available. Please create one first.")
@@ -121,9 +180,7 @@ Enter your choice: '''))
                                     f"{details['last name']} already "
                                     f"in Address Book!!!")
                             else:
-                                contact = book.add_contact(details)
-                                manager.add_into_city(contact)
-                                manager.add_into_state(contact)
+                                manager.handle_add_contact(book, details)
                                 print("Contact added successfully.")
 
                             add_more = input(
@@ -135,15 +192,15 @@ Enter your choice: '''))
                                 f"No Address Book named '{selected_name}' found.")
                             break
 
-                case 4:
+                case 5:
                     city_choice = input("Please enter the City Name: ")
                     manager.search_by_city(city_choice)
 
-                case 5:
+                case 6:
                     state_choice = input("Please enter the State Name: ")
                     manager.search_by_state(state_choice)
 
-                case 6:
+                case 7:
                     lookup_choice = input("Enter 'city' for lookup by city.\
                            Enter 'state' for lookup by State: ").strip().lower()
 
@@ -166,7 +223,7 @@ Enter your choice: '''))
                         print(
                             "Invalid choice. Please enter 'city' or 'state'.")
 
-                case 7:
+                case 8:
                     manager.show_address_book_names()
                     address_book = manager.get_address_book(input(
                         "Select the Address Book to sort By Name:"))
@@ -179,8 +236,9 @@ Enter The field name to sort by:
                     address_book.sort_by_field(field)
                     print("The Address Book is Now Sorted By Name...")
 
-                case 8:
+                case 9:
                     print("Exiting Address Book Program. Goodbye!")
+                    manager.save_to_file(default_file)
                     run = False
 
                 case _:
