@@ -46,10 +46,20 @@ class AddressBook:
 
         print("No Such Contact Available!!!")
 
-    def sort_by_name(self):
-        self.contacts.sort(
-            key=lambda x: (x.details["first name"], x.details["last name"]))
-
+    def sort_by_field(self, field):
+        if field == 'name':
+            self.contacts.sort(
+                key=lambda x: (
+                x.details["first name"], x.details["last name"]))
+        elif field == 'city':
+            self.contacts.sort(
+                key=lambda x: x.details["city"])
+        elif field == 'state':
+            self.contacts.sort(
+                key=lambda x: x.details["state"])
+        elif field == 'zip':
+            self.contacts.sort(
+                key=lambda x: x.details["zip"])
 
     def __contains__(self, item):
         firstname, lastname = item
@@ -90,7 +100,4 @@ if __name__ == "__main__":
         "email": "subramanyamk2003@gmail.com"
     }
     address_book.add_contact(detail)
-    address_book.show_contacts()
-
-    address_book.sort_by_name()
     address_book.show_contacts()
