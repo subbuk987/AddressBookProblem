@@ -1,4 +1,3 @@
-import os
 
 
 def get_contact_details():
@@ -37,6 +36,8 @@ def write_to_file(file_path, details):
         for k, v in details.items():
             file.write(f"{k} : {v}\n")
         file.write("===========================================\n")
+
+
 
 
 if __name__ == "__main__":

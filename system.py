@@ -1,3 +1,4 @@
+import csv
 import os
 from addressbook import AddressBook
 from utils.utility import get_contact_details, print_contact, read_from_file, \
@@ -103,13 +104,41 @@ class AddressBookManager:
     def save_to_file(self, filepath):
 
         for name, book in self.address_books.items():
-            with open(filepath, 'a') as file:
+            with open(filepath, 'w') as file:
                 file.write(f"AddressBook Name : {name}\n")
                 file.write(f"===========================================\n")
             for contact in book.contacts:
                 write_to_file(filepath, contact.info)
             with open(filepath, 'a') as file:
                 file.write("\n")
+
+    def save_all_contacts_to_csv(self, csv_file_path):
+        if not self.address_books:
+            print("No Address Books available to save.")
+            return
+
+        headers = ["AddressBook", "First Name", "Last Name", "Address", "City",
+                   "State", "Zip", "Phone", "Email"]
+
+        with open(csv_file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+
+            for name, book in self.address_books.items():
+                for contact in book.contacts:
+                    writer.writerow([
+                        name,
+                        contact.info["first name"],
+                        contact.info["last name"],
+                        contact.info["address"],
+                        contact.info["city"],
+                        contact.info["state"],
+                        contact.info["zip"],
+                        contact.info["phone"],
+                        contact.info["email"]
+                    ])
+
+        print(f"All contacts saved to '{csv_file_path}' successfully!")
 
     def __len__(self):
         return len(self.address_books)
@@ -134,7 +163,8 @@ def main():
 6. Search Contacts by State
 7. Count By City or State
 8. Sort an Address Book By any Field
-9. Quit
+9. Save contacts to CSV
+10. Quit
 ==============================
 Enter your choice: '''))
 
@@ -146,9 +176,12 @@ Enter your choice: '''))
 
                 case 2:
                     manager.show_address_book_names()
-                    selected_name = input(
-                        "Enter Address Book Name: ").strip()
-                    manager.address_books[selected_name].show_contacts()
+                    selected_name = input("Enter Address Book Name: ").strip()
+                    book = manager.get_address_book(selected_name)
+                    if not book:
+                        print("Invalid Address Book Name!")
+                        continue
+                    book.show_contacts()
 
                 case 3:
                     while True:
@@ -237,6 +270,9 @@ Enter The field name to sort by:
                     print("The Address Book is Now Sorted By Name...")
 
                 case 9:
+                    manager.save_all_contacts_to_csv('files/contacts.csv')
+
+                case 10:
                     print("Exiting Address Book Program. Goodbye!")
                     manager.save_to_file(default_file)
                     run = False
